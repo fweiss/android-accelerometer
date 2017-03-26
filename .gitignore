@@ -1,7 +1,6 @@
-/.idea
-/bin
+/.idea/workspace.xml
+/.idea/tasks.xml
 /gen
 /out
 /.classpath
 /.project
-/accelerometer.iml

@@ -17,3 +17,8 @@ To aid in the computations, I created a simple spreadsheet, which would help in 
 The sensor list is technically not part of the digital filter code.
 I found it useful for looking up the details of the available sensors, which vary by device type.
 On  Motorola XT1080, the accelerometer is LIS3DH 3-axis Accelerometer.
+
+## Building and running
+
+The source contains IntelliJ files to facilitate using that IDE.
+It should be good to go if you have IntelliJ and the Android SDK configured.

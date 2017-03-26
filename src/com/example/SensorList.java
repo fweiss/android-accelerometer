@@ -10,8 +10,6 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
-import com.example.R;
-
 public class SensorList
 extends ListActivity {
 	private SensorManager sensorManager;
