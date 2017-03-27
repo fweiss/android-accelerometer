@@ -19,7 +19,7 @@ The basic idea was to use a bandpass filter to detect energies in the shake freq
 I searched online to refresh my mind on DSP principles.
 I found a [really good source that covered it comprehensively](http://www.dspguide.com/ch19/3.htm).
 In particular, one chapter covered bandpass and notch filters, with the recurrence equations and parameter computations.
-To aid in the computations, I created a simple spreadsheet, which would help in adjusting the parameters.
+To aid in the computations, I created a simple spreadsheet, which would help in adjusting the coefficients.
 
 The sensor list is technically not part of the digital filter code.
 I found it useful for looking up the details of the available sensors, which vary by device type.
