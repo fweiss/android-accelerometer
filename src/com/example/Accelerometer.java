@@ -176,8 +176,8 @@ implements SensorEventListener {
 	 */
 	class Filter
 	extends TimerTask {
-		private float a0 = (float) 0.535144118;
-		private float a1 = (float) -0.132788237;
+		private float a0 = (float) +0.535144118;
+		private float a1 = (float) +0.132788237;
 		private float a2 = (float) -0.402355882;
 		private float b1 = (float) -0.154508496;
 		private float b2 = (float) -0.0625;
