@@ -13,22 +13,22 @@ import android.widget.ArrayAdapter;
 public class SensorListActivity
 extends ListActivity {
 
-	@Override
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         List<String> sensorNames = getSensorNames();
         setContentView(R.layout.sensor_list_view);
-		setListAdapter(new ArrayAdapter<String>(this, R.layout.sensor_list_item, sensorNames));
+        setListAdapter(new ArrayAdapter<String>(this, R.layout.sensor_list_item, sensorNames));
     }
 	
-	private List<String> getSensorNames() {
+    private List<String> getSensorNames() {
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
-		ArrayList<String> names = new ArrayList<String>();
-		for (Sensor sensor : sensors) {
-			names.add(sensor.getName());
-		}
-		return names;
-	}
+        List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
+        ArrayList<String> names = new ArrayList<String>();
+        for (Sensor sensor : sensors) {
+            names.add(sensor.getName());
+        }
+        return names;
+    }
 
 }
