@@ -2,6 +2,13 @@
 
 An example app that uses a digital filter to detect shaking the device
 
+## Usage
+
+When you open the app, you'll see the live values from the device's embedded accelerometer.
+Below the digital display is an analog bar.
+When you gently shake the device from side to side (X-axis) the analog bar will fill, showing full when consistent shaking is detected.
+The bar will not show full is the device is merely tapped.
+
 ## Notes
 
 This project was started in early 2010, in response to a SO question regarding detecting shake via the embedded accelerometer.
