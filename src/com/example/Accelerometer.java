@@ -140,7 +140,7 @@ implements SensorEventListener {
 	public boolean onOptionsItemSelected(MenuItem menu) {
     	switch (menu.getItemId()) {
     	case R.id.sensor_list:
-    		startActivity(new Intent(this, SensorList.class));
+    		startActivity(new Intent(this, SensorListActivity.class));
     	}
     	return false;
     }

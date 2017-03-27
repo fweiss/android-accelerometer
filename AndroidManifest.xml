@@ -12,7 +12,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SensorList"></activity>
+        <activity android:name=".SensorListActivity"></activity>
 
     </application>
     <uses-sdk android:minSdkVersion="6" />

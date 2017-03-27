@@ -10,7 +10,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
-public class SensorList
+public class SensorListActivity
 extends ListActivity {
 
 	@Override
