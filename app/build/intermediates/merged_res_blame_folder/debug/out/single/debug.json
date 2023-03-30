@@ -1,0 +1,30 @@
+[
+    {
+        "merged": "com.example.app-merged_res-5:/layout_main.xml.flat",
+        "source": "com.example.app-main-7:/layout/main.xml"
+    },
+    {
+        "merged": "com.example.app-merged_res-5:/drawable-ldpi_icon.png.flat",
+        "source": "com.example.app-main-7:/drawable-ldpi/icon.png"
+    },
+    {
+        "merged": "com.example.app-merged_res-5:/drawable-hdpi_icon.png.flat",
+        "source": "com.example.app-main-7:/drawable-hdpi/icon.png"
+    },
+    {
+        "merged": "com.example.app-merged_res-5:/drawable-mdpi_icon.png.flat",
+        "source": "com.example.app-main-7:/drawable-mdpi/icon.png"
+    },
+    {
+        "merged": "com.example.app-merged_res-5:/layout_sensor_list_view.xml.flat",
+        "source": "com.example.app-main-7:/layout/sensor_list_view.xml"
+    },
+    {
+        "merged": "com.example.app-merged_res-5:/menu_main_menu.xml.flat",
+        "source": "com.example.app-main-7:/menu/main_menu.xml"
+    },
+    {
+        "merged": "com.example.app-merged_res-5:/layout_sensor_list_item.xml.flat",
+        "source": "com.example.app-main-7:/layout/sensor_list_item.xml"
+    }
+]

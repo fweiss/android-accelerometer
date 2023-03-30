@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accuracy_high">High accuracy</string>
+    <string name="accuracy_low">Low accuracy</string>
+    <string name="accuracy_medium">Medium accuracy</string>
+    <string name="accuracy_unreliable">Unreliable accuracy</string>
+    <string name="app_name">Accelerometer</string>
+    <string name="hello">Hello World, Accelerometer!</string>
+    <string name="no_accelerometer">No accelerometer</string>
+</resources>
