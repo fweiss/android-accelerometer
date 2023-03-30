@@ -1,8 +1,0 @@
-com.example.app-pngs-0 E:\Projects\Test\android-accelerometer\app\build\generated\res\pngs\debug
-com.example.app-resValues-1 E:\Projects\Test\android-accelerometer\app\build\generated\res\resValues\debug
-com.example.app-rs-2 E:\Projects\Test\android-accelerometer\app\build\generated\res\rs\debug
-com.example.app-mergeDebugResources-3 E:\Projects\Test\android-accelerometer\app\build\intermediates\incremental\debug\mergeDebugResources\merged.dir
-com.example.app-mergeDebugResources-4 E:\Projects\Test\android-accelerometer\app\build\intermediates\incremental\debug\mergeDebugResources\stripped.dir
-com.example.app-merged_res-5 E:\Projects\Test\android-accelerometer\app\build\intermediates\merged_res\debug
-com.example.app-debug-6 E:\Projects\Test\android-accelerometer\app\src\debug\res
-com.example.app-main-7 E:\Projects\Test\android-accelerometer\app\src\main\res
