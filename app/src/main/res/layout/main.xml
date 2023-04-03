@@ -25,21 +25,24 @@
 	    android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
 	    android:text="@string/hello"
-    	android:textSize="35sp"/>
+    	android:textSize="35sp"
+		android:typeface="monospace"/>
     />
 	<TextView  
 		android:id="@+id/y_label"
 	    android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
 	    android:text="@string/hello"
-    	android:textSize="35sp"/>
+    	android:textSize="35sp"
+		android:typeface="monospace"/>
     />
 	<TextView  
 		android:id="@+id/z_label"
 	    android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
 	    android:text="@string/hello"
-    	android:textSize="35sp"/>
+    	android:textSize="35sp"
+		android:typeface="monospace"/>
     />
 	<TextView  
 		android:id="@+id/abs_label"

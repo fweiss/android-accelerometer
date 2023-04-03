@@ -45,6 +45,8 @@ implements SensorEventListener {
     private float currentSample;
     private float currentFilter;
     private Timer samplingTimer;
+    private LowPassFilterTask lowPassFilterTask;
+    private Timer lowPassFilterTimer;
 
     private float x, y, z;
 
@@ -74,6 +76,10 @@ implements SensorEventListener {
         long delay = 0;
         long period = 83;
         samplingTimer.scheduleAtFixedRate(new Filter(), delay, period);
+
+        lowPassFilterTask = new LowPassFilterTask();
+        lowPassFilterTimer = new Timer();
+        lowPassFilterTimer.scheduleAtFixedRate(lowPassFilterTask, 0, lowPassFilterTask.periodMs());
     }
 
     @Override
@@ -82,6 +88,10 @@ implements SensorEventListener {
         sensorManager.unregisterListener(this);
         if (samplingTimer != null) {
             samplingTimer.cancel();
+        }
+        // fixme move constructor to create or delete here
+        if (lowPassFilterTimer != null) {
+            lowPassFilterTimer.cancel();
         }
     }
 	
@@ -122,10 +132,13 @@ implements SensorEventListener {
             float abs = new Float(Math.sqrt(x*x + y*y + z*z));
             currentSample = x;
 
-            xLabel.setText(String.format("X: %+2.5f", x));
-            yLabel.setText(String.format("Y: %+2.5f", y));
-            zLabel.setText(String.format("Z: %+2.5f", z));
-            absLabel.setText(String.format("ABS: %+2.5f ", abs));
+            lowPassFilterTask.inputXYZA(x, y, z, abs);
+
+            xLabel.setText(String.format("X: %+2.2f", lowPassFilterTask.xOutput()));
+            yLabel.setText(String.format("Y: %+2.2f", lowPassFilterTask.yOutput()));
+            zLabel.setText(String.format("Z: %+2.2f", lowPassFilterTask.zOutput()));
+//            absLabel.setText(String.format("ABS: %+2.5f ", abs));
+            absLabel.setText(String.format("ABS: %+2.2f ", lowPassFilterTask.aOutput()));
             int progress = 100 * (int) (Math.sqrt(currentFilter * currentFilter));
             filter.setProgress(progress);
             //}
@@ -197,6 +210,50 @@ implements SensorEventListener {
             x1 = x0;
             y2 = y1;
             y1 = y0;
+        }
+    }
+
+    /**
+     * A digital low pass filter to smooth out the noise accelerometer signal.
+     * Source: http://www.dspguide.com/ch19/2.htm
+     */
+    class LowPassFilterTask
+    extends TimerTask {
+        private final LowPassFilter xFilter = new LowPassFilter();
+        private final LowPassFilter yFilter = new LowPassFilter();
+        private final LowPassFilter zFilter = new LowPassFilter();
+        private final LowPassFilter aFilter = new LowPassFilter();
+
+        public void inputXYZA(float x, float y, float z, float a) {
+            xFilter.currentInput = x;
+            yFilter.currentInput = y;
+            zFilter.currentInput = z;
+            aFilter.currentInput = a;
+        }
+
+        @Override
+        public void run() {
+            xFilter.update();
+            yFilter.update();
+            zFilter.update();
+            aFilter.update();
+        }
+
+        public float xOutput() {
+            return xFilter.currentOutput;
+        }
+        public float yOutput() {
+            return yFilter.currentOutput;
+        }
+        public float zOutput() {
+            return zFilter.currentOutput;
+        }
+        public float aOutput() {
+            return aFilter.currentOutput;
+        }
+
+        public long periodMs() {
+            return xFilter.periodMs();
         }
     }
 }
