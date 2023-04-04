@@ -41,9 +41,12 @@ implements SensorEventListener {
     private TextView sample;
     private ProgressBar filter;
     private ProgressBar filterBar1;
+
     protected SensorEventListener sensorEventListener;
+
     private float currentSample;
     private float currentFilter;
+
     private Timer samplingTimer;
     private LowPassFilterTask lowPassFilterTask;
     private Timer lowPassFilterTimer;
@@ -54,17 +57,19 @@ implements SensorEventListener {
 		
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);   
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         findViews();
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         filterBar1.setVisibility(View.INVISIBLE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         String name = accelerometer.getName();
         sensorName.setText(name);
 
@@ -85,6 +90,7 @@ implements SensorEventListener {
     @Override
     protected void onPause() {
         super.onPause();
+
         sensorManager.unregisterListener(this);
         if (samplingTimer != null) {
             samplingTimer.cancel();
@@ -94,7 +100,19 @@ implements SensorEventListener {
             lowPassFilterTimer.cancel();
         }
     }
-	
+
+    protected void findViews() {
+        sensorName = (TextView) findViewById(R.id.name_label);
+        accuracyLabel = (TextView) findViewById(R.id.accuracy_label);
+        xLabel = (TextView) findViewById(R.id.x_label);
+        yLabel = (TextView) findViewById(R.id.y_label);
+        zLabel = (TextView) findViewById(R.id.z_label);
+        absLabel = (TextView) findViewById(R.id.abs_label);
+        sample = (TextView) findViewById(R.id.sample_label);
+        filter = (ProgressBar) findViewById(R.id.filter_label);
+        filterBar1 = (ProgressBar) findViewById(R.id.filter_bar_1);
+    }
+
     @Override // SensorEventListener
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -159,18 +177,7 @@ implements SensorEventListener {
     	}
     	return false;
     }
-    protected void findViews() {
-    	sensorName = (TextView) findViewById(R.id.name_label);
-        accuracyLabel = (TextView) findViewById(R.id.accuracy_label);
-        xLabel = (TextView) findViewById(R.id.x_label);
-        yLabel = (TextView) findViewById(R.id.y_label);
-        zLabel = (TextView) findViewById(R.id.z_label);
-        absLabel = (TextView) findViewById(R.id.abs_label);
-        sample = (TextView) findViewById(R.id.sample_label);
-        filter = (ProgressBar) findViewById(R.id.filter_label);
-        filterBar1 = (ProgressBar) findViewById(R.id.filter_bar_1);
-    }
-    
+
     protected void displayRawData(float[] values) {
         x = values[DATA_X];
         y = values[DATA_Y];
