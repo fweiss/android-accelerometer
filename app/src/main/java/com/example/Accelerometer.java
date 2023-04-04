@@ -46,9 +46,6 @@ implements SensorEventListener {
 
     protected ShakeFilterTask shakeFilterTask;
 
-    private float currentSample;
-    private float currentFilter;
-
     private Timer samplingTimer;
     private LowPassFilterTask lowPassFilterTask;
     private Timer lowPassFilterTimer;
@@ -80,11 +77,6 @@ implements SensorEventListener {
         int rate = SensorManager.SENSOR_DELAY_FASTEST; // ~ 10 msec
         sensorManager.registerListener(this, accelerometer, rate);
 
-        samplingTimer = new Timer();
-        long delay = 0;
-        long period = 83;
-        samplingTimer.scheduleAtFixedRate(new Filter(), delay, period);
-
         shakeFilterTask.start();
 
         lowPassFilterTask = new LowPassFilterTask();
@@ -99,9 +91,7 @@ implements SensorEventListener {
         sensorManager.unregisterListener(this);
 
         shakeFilterTask.stop();
-        if (samplingTimer != null) {
-            samplingTimer.cancel();
-        }
+
         // fixme move constructor to create or delete here
         if (lowPassFilterTimer != null) {
             lowPassFilterTimer.cancel();
@@ -155,19 +145,15 @@ implements SensorEventListener {
             y = sensorEvent.values[DATA_Y];
             z = sensorEvent.values[DATA_Z];
             float abs = new Float(Math.sqrt(x*x + y*y + z*z));
-            currentSample = x;
-
-            shakeFilterTask.shakeFilter.input = x;
 
             lowPassFilterTask.inputXYZA(x, y, z, abs);
 
             xLabel.setText(String.format("X: %+2.2f", lowPassFilterTask.xOutput()));
             yLabel.setText(String.format("Y: %+2.2f", lowPassFilterTask.yOutput()));
             zLabel.setText(String.format("Z: %+2.2f", lowPassFilterTask.zOutput()));
-//            absLabel.setText(String.format("ABS: %+2.5f ", abs));
             absLabel.setText(String.format("ABS: %+2.2f ", lowPassFilterTask.aOutput()));
-//            int progress = 100 * (int) (Math.sqrt(currentFilter * currentFilter));
 
+            shakeFilterTask.shakeFilter.input = x;
             float shakeFilterOutput = shakeFilterTask.shakeFilter.output;
             int progress = 100 * (int) Math.sqrt(shakeFilterOutput * shakeFilterOutput);
 
@@ -201,36 +187,6 @@ implements SensorEventListener {
         yLabel.setText(String.format("Y: %+2.5f", y));
         zLabel.setText(String.format("Z: %+2.5f", z));
         absLabel.setText(String.format("ABS: %+2.5f ", abs));
-    }
-
-    /**
-    * A digital recursive band-pass filter with sampling frequency of 12 Hz,
-    * center 3.6 Hz, bandwidth 3 Hz, low cut-off 2.1 Hz, high cut-off 5.1 Hz.
-    *
-    * Source: http://www.dspguide.com/ch19/3.htm
-    */
-    class Filter
-    extends TimerTask {
-        private final float a0 = (float) +0.535144118;
-        private final float a1 = (float) +0.132788237;
-        private final float a2 = (float) -0.402355882;
-        private final float b1 = (float) -0.154508496;
-        private final float b2 = (float) -0.062500000;
-
-        private float x0, x1, x2;
-        private float y0, y1, y2;
-
-        @Override
-        public void run() {
-            x0 = currentSample;
-            y0 = a0 * x0 + a1 * x1 + a2 * x2
-               + b1 * y1 + b2 * y2;
-            currentFilter = y0;
-            x2 = x1;
-            x1 = x0;
-            y2 = y1;
-            y1 = y0;
-        }
     }
 
     /**
