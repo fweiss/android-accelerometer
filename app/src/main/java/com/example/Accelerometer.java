@@ -44,6 +44,8 @@ implements SensorEventListener {
 
     protected SensorEventListener sensorEventListener;
 
+    protected ShakeFilterTask shakeFilterTask;
+
     private float currentSample;
     private float currentFilter;
 
@@ -64,6 +66,7 @@ implements SensorEventListener {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         filterBar1.setVisibility(View.INVISIBLE);
+        shakeFilterTask = new ShakeFilterTask();
     }
 
     @Override
@@ -82,6 +85,8 @@ implements SensorEventListener {
         long period = 83;
         samplingTimer.scheduleAtFixedRate(new Filter(), delay, period);
 
+        shakeFilterTask.start();
+
         lowPassFilterTask = new LowPassFilterTask();
         lowPassFilterTimer = new Timer();
         lowPassFilterTimer.scheduleAtFixedRate(lowPassFilterTask, 0, lowPassFilterTask.periodMs());
@@ -92,6 +97,8 @@ implements SensorEventListener {
         super.onPause();
 
         sensorManager.unregisterListener(this);
+
+        shakeFilterTask.stop();
         if (samplingTimer != null) {
             samplingTimer.cancel();
         }
@@ -150,6 +157,8 @@ implements SensorEventListener {
             float abs = new Float(Math.sqrt(x*x + y*y + z*z));
             currentSample = x;
 
+            shakeFilterTask.shakeFilter.input = x;
+
             lowPassFilterTask.inputXYZA(x, y, z, abs);
 
             xLabel.setText(String.format("X: %+2.2f", lowPassFilterTask.xOutput()));
@@ -157,7 +166,11 @@ implements SensorEventListener {
             zLabel.setText(String.format("Z: %+2.2f", lowPassFilterTask.zOutput()));
 //            absLabel.setText(String.format("ABS: %+2.5f ", abs));
             absLabel.setText(String.format("ABS: %+2.2f ", lowPassFilterTask.aOutput()));
-            int progress = 100 * (int) (Math.sqrt(currentFilter * currentFilter));
+//            int progress = 100 * (int) (Math.sqrt(currentFilter * currentFilter));
+
+            float shakeFilterOutput = shakeFilterTask.shakeFilter.output;
+            int progress = 100 * (int) Math.sqrt(shakeFilterOutput * shakeFilterOutput);
+
             filter.setProgress(progress);
             //}
         }
@@ -261,6 +274,30 @@ implements SensorEventListener {
 
         public long periodMs() {
             return xFilter.periodMs();
+        }
+    }
+
+    private class ShakeFilterTask {
+        public Timer timer;
+        public ShakeFilter shakeFilter;
+        TimerTask timerTask;
+        ShakeFilterTask() {
+            timer = new Timer();
+            shakeFilter = new ShakeFilter();
+            timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    shakeFilter.update();
+                }
+            };
+        }
+        public void start() {
+            long delay = 0;
+            long period = 83; // todo get from filter
+            timer.scheduleAtFixedRate(timerTask, delay, period);
+        }
+        public void stop() {
+            timer.cancel();
         }
     }
 }
