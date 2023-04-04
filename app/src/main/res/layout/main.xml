@@ -50,12 +50,8 @@
 	    android:layout_height="wrap_content" 
 	    android:text="@string/hello"
     />
-	<TextView  
-		android:id="@+id/sample_label"
-	    android:layout_width="fill_parent" 
-	    android:layout_height="wrap_content" 
-    />
-	<ProgressBar  
+
+	<ProgressBar
 		android:id="@+id/filter_label"
 		style="?android:attr/progressBarStyleHorizontal"
 	    android:layout_width="fill_parent" 

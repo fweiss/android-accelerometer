@@ -6,6 +6,7 @@ package com.example;
  *
  * Source: http://www.dspguide.com/ch19/3.htm
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class ShakeFilter {
     public float input;
     public float output;

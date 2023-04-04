@@ -38,7 +38,6 @@ implements SensorEventListener {
     private TextView accuracyLabel;
     private TextView xLabel, yLabel, zLabel, absLabel;
     private TextView sensorName;
-    private TextView sample;
     private ProgressBar filter;
     private ProgressBar filterBar1;
 
@@ -50,10 +49,6 @@ implements SensorEventListener {
     private LowPassFilterTask lowPassFilterTask;
     private Timer lowPassFilterTimer;
 
-    private float x, y, z;
-
-    private long lastUpdate = -1;
-		
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +100,6 @@ implements SensorEventListener {
         yLabel = (TextView) findViewById(R.id.y_label);
         zLabel = (TextView) findViewById(R.id.z_label);
         absLabel = (TextView) findViewById(R.id.abs_label);
-        sample = (TextView) findViewById(R.id.sample_label);
         filter = (ProgressBar) findViewById(R.id.filter_label);
         filterBar1 = (ProgressBar) findViewById(R.id.filter_bar_1);
     }
@@ -130,21 +124,14 @@ implements SensorEventListener {
         }
     }
 
+    // may need to throttle to 1/100ms to avoid GC overload
     @Override // SensorEventListener
-    //public void onSensorChanged(SensorEvent sensorEvent, float[] values) {
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            long curTime = System.currentTimeMillis();
-            // only allow one update every 100ms, otherwise updates
-            // come way too fast and the phone gets bogged down
-            // with garbage collection
-            //if (lastUpdate == -1 || (curTime - lastUpdate) > 100) {
-            lastUpdate = curTime;
-
-            x = sensorEvent.values[DATA_X];
-            y = sensorEvent.values[DATA_Y];
-            z = sensorEvent.values[DATA_Z];
-            float abs = new Float(Math.sqrt(x*x + y*y + z*z));
+            float x = sensorEvent.values[DATA_X];
+            float y = sensorEvent.values[DATA_Y];
+            float z = sensorEvent.values[DATA_Z];
+            float abs = (float) Math.sqrt(x*x + y*y + z*z);
 
             lowPassFilterTask.inputXYZA(x, y, z, abs);
 
@@ -158,7 +145,6 @@ implements SensorEventListener {
             int progress = 100 * (int) Math.sqrt(shakeFilterOutput * shakeFilterOutput);
 
             filter.setProgress(progress);
-            //}
         }
     }
 
@@ -170,30 +156,17 @@ implements SensorEventListener {
     }
     @Override
 	public boolean onOptionsItemSelected(MenuItem menu) {
-    	switch (menu.getItemId()) {
-    	case R.id.sensor_list:
+    	if (menu.getItemId() == R.id.sensor_list) {
     		startActivity(new Intent(this, SensorListActivity.class));
     	}
     	return false;
-    }
-
-    protected void displayRawData(float[] values) {
-        x = values[DATA_X];
-        y = values[DATA_Y];
-        z = values[DATA_Z];
-        float abs = new Float(Math.sqrt(x*x + y*y + z*z));
-
-        xLabel.setText(String.format("X: %+2.5f", x));
-        yLabel.setText(String.format("Y: %+2.5f", y));
-        zLabel.setText(String.format("Z: %+2.5f", z));
-        absLabel.setText(String.format("ABS: %+2.5f ", abs));
     }
 
     /**
      * A digital low pass filter to smooth out the noise accelerometer signal.
      * Source: http://www.dspguide.com/ch19/2.htm
      */
-    class LowPassFilterTask
+    static class LowPassFilterTask
     extends TimerTask {
         private final LowPassFilter xFilter = new LowPassFilter();
         private final LowPassFilter yFilter = new LowPassFilter();
@@ -233,7 +206,7 @@ implements SensorEventListener {
         }
     }
 
-    private class ShakeFilterTask {
+    static private class ShakeFilterTask {
         public Timer timer;
         public ShakeFilter shakeFilter;
         TimerTask timerTask;
