@@ -43,7 +43,7 @@ implements SensorEventListener {
 
     protected SensorEventListener sensorEventListener;
 
-    protected ShakeFilterTask shakeFilterTask;
+    protected FilterTask shakeFilterTask;
 
     private Timer samplingTimer;
     private LowPassFilterTask lowPassFilterTask;
@@ -58,7 +58,7 @@ implements SensorEventListener {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         filterBar1.setVisibility(View.INVISIBLE);
-        shakeFilterTask = new ShakeFilterTask();
+        shakeFilterTask = new FilterTask(new ShakeFilter());
     }
 
     @Override
@@ -140,8 +140,8 @@ implements SensorEventListener {
             zLabel.setText(String.format("Z: %+2.2f", lowPassFilterTask.zOutput()));
             absLabel.setText(String.format("ABS: %+2.2f ", lowPassFilterTask.aOutput()));
 
-            shakeFilterTask.shakeFilter.input = x;
-            float shakeFilterOutput = shakeFilterTask.shakeFilter.output;
+            shakeFilterTask.filter.input = x;
+            float shakeFilterOutput = shakeFilterTask.filter.output;
             int progress = 100 * (int) Math.sqrt(shakeFilterOutput * shakeFilterOutput);
 
             filter.setProgress(progress);
@@ -206,23 +206,27 @@ implements SensorEventListener {
         }
     }
 
-    static private class ShakeFilterTask {
+    /**
+     * Wrap a recursive filter with a timer so that the calculation of each iteration
+     * matches a real-time sample.
+     */
+    static private class FilterTask {
         public Timer timer;
-        public ShakeFilter shakeFilter;
+        public AbstractFilter filter;
         TimerTask timerTask;
-        ShakeFilterTask() {
+        FilterTask(AbstractFilter filter) {
+            this.filter = filter;
             timer = new Timer();
-            shakeFilter = new ShakeFilter();
             timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    shakeFilter.update();
+                    filter.update();
                 }
             };
         }
         public void start() {
             long delay = 0;
-            long period = 83; // todo get from filter
+            long period = filter.periodMs();
             timer.scheduleAtFixedRate(timerTask, delay, period);
         }
         public void stop() {

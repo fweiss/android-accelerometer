@@ -7,9 +7,9 @@ package com.example;
  * Source: http://www.dspguide.com/ch19/3.htm
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class ShakeFilter {
-    public float input;
-    public float output;
+public class ShakeFilter
+extends AbstractFilter {
+    public final float sampleFrequency = 12;
 
     private final float a0 = (float) +0.535144118;
     private final float a1 = (float) +0.132788237;
@@ -29,5 +29,8 @@ public class ShakeFilter {
         x1 = x0;
         y2 = y1;
         y1 = y0;
+    }
+    public long periodMs() {
+        return (long)(1000 / sampleFrequency);
     }
 }
