@@ -44,10 +44,10 @@ implements SensorEventListener {
     protected SensorEventListener sensorEventListener;
 
     protected FilterTask shakeFilterTask;
-
-    private Timer samplingTimer;
-    private LowPassFilterTask lowPassFilterTask;
-    private Timer lowPassFilterTimer;
+    protected FilterTask xLowPassFilterTask;
+    protected FilterTask yLowPassFilterTask;
+    protected FilterTask zLowPassFilterTask;
+    protected FilterTask aLowPassFilterTask;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,12 @@ implements SensorEventListener {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         filterBar1.setVisibility(View.INVISIBLE);
+
         shakeFilterTask = new FilterTask(new ShakeFilter());
+        xLowPassFilterTask = new FilterTask(new LowPassFilter());
+        yLowPassFilterTask = new FilterTask(new LowPassFilter());
+        zLowPassFilterTask = new FilterTask(new LowPassFilter());
+        aLowPassFilterTask = new FilterTask(new LowPassFilter());
     }
 
     @Override
@@ -73,10 +78,10 @@ implements SensorEventListener {
         sensorManager.registerListener(this, accelerometer, rate);
 
         shakeFilterTask.start();
-
-        lowPassFilterTask = new LowPassFilterTask();
-        lowPassFilterTimer = new Timer();
-        lowPassFilterTimer.scheduleAtFixedRate(lowPassFilterTask, 0, lowPassFilterTask.periodMs());
+        xLowPassFilterTask.start();
+        yLowPassFilterTask.start();
+        zLowPassFilterTask.start();
+        aLowPassFilterTask.start();
     }
 
     @Override
@@ -86,11 +91,10 @@ implements SensorEventListener {
         sensorManager.unregisterListener(this);
 
         shakeFilterTask.stop();
-
-        // fixme move constructor to create or delete here
-        if (lowPassFilterTimer != null) {
-            lowPassFilterTimer.cancel();
-        }
+        xLowPassFilterTask.stop();
+        yLowPassFilterTask.stop();
+        zLowPassFilterTask.stop();
+        aLowPassFilterTask.stop();
     }
 
     protected void findViews() {
@@ -133,17 +137,19 @@ implements SensorEventListener {
             float z = sensorEvent.values[DATA_Z];
             float abs = (float) Math.sqrt(x*x + y*y + z*z);
 
-            lowPassFilterTask.inputXYZA(x, y, z, abs);
+            xLowPassFilterTask.filter.input = x;
+            yLowPassFilterTask.filter.input = y;
+            zLowPassFilterTask.filter.input = z;
+            aLowPassFilterTask.filter.input = abs;
+            xLabel.setText(String.format("X: %+2.2f", xLowPassFilterTask.filter.output));
+            yLabel.setText(String.format("Y: %+2.2f", yLowPassFilterTask.filter.output));
+            zLabel.setText(String.format("Z: %+2.2f", zLowPassFilterTask.filter.output));
+            absLabel.setText(String.format("ABS: %+2.2f ", aLowPassFilterTask.filter.output));
 
-            xLabel.setText(String.format("X: %+2.2f", lowPassFilterTask.xOutput()));
-            yLabel.setText(String.format("Y: %+2.2f", lowPassFilterTask.yOutput()));
-            zLabel.setText(String.format("Z: %+2.2f", lowPassFilterTask.zOutput()));
-            absLabel.setText(String.format("ABS: %+2.2f ", lowPassFilterTask.aOutput()));
 
             shakeFilterTask.filter.input = x;
             float shakeFilterOutput = shakeFilterTask.filter.output;
             int progress = 100 * (int) Math.sqrt(shakeFilterOutput * shakeFilterOutput);
-
             filter.setProgress(progress);
         }
     }
@@ -163,57 +169,14 @@ implements SensorEventListener {
     }
 
     /**
-     * A digital low pass filter to smooth out the noise accelerometer signal.
-     * Source: http://www.dspguide.com/ch19/2.htm
-     */
-    static class LowPassFilterTask
-    extends TimerTask {
-        private final LowPassFilter xFilter = new LowPassFilter();
-        private final LowPassFilter yFilter = new LowPassFilter();
-        private final LowPassFilter zFilter = new LowPassFilter();
-        private final LowPassFilter aFilter = new LowPassFilter();
-
-        public void inputXYZA(float x, float y, float z, float a) {
-            xFilter.currentInput = x;
-            yFilter.currentInput = y;
-            zFilter.currentInput = z;
-            aFilter.currentInput = a;
-        }
-
-        @Override
-        public void run() {
-            xFilter.update();
-            yFilter.update();
-            zFilter.update();
-            aFilter.update();
-        }
-
-        public float xOutput() {
-            return xFilter.currentOutput;
-        }
-        public float yOutput() {
-            return yFilter.currentOutput;
-        }
-        public float zOutput() {
-            return zFilter.currentOutput;
-        }
-        public float aOutput() {
-            return aFilter.currentOutput;
-        }
-
-        public long periodMs() {
-            return xFilter.periodMs();
-        }
-    }
-
-    /**
      * Wrap a recursive filter with a timer so that the calculation of each iteration
-     * matches a real-time sample.
+     * matches the real-time samples.
      */
     static private class FilterTask {
-        public Timer timer;
-        public AbstractFilter filter;
-        TimerTask timerTask;
+        public final AbstractFilter filter;
+        public final Timer timer;
+        private TimerTask timerTask;
+
         FilterTask(AbstractFilter filter) {
             this.filter = filter;
             timer = new Timer();
